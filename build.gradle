@@ -1,0 +1,56 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.2'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+repositories {
+	mavenCentral()
+//	maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+	// ✅ Core Spring Boot Dependencies
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	// ✅ Database: PostgreSQL + MongoDB
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	runtimeOnly 'org.postgresql:postgresql' // If using PostgreSQL
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+//	// ✅ Security + JWT Authentication
+//	implementation 'org.springframework.boot:spring-boot-starter-security'
+//	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+//	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+//	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+	// ✅ Lombok (For reducing boilerplate code)
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// ✅ Testing Dependencies
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+//	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	//Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+	//Bucket4j Core
+	implementation 'com.bucket4j:bucket4j-redis:8.9.0'
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
