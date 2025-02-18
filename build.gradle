@@ -28,10 +28,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
 //	// ✅ Security + JWT Authentication
-//	implementation 'org.springframework.boot:spring-boot-starter-security'
-//	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-//	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
-//	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+//	implementation 'io.jsonwebtoken:jjwt:0.11.5'
 
 	// ✅ Lombok (For reducing boilerplate code)
 	compileOnly 'org.projectlombok:lombok'
@@ -40,7 +41,7 @@ dependencies {
 	// ✅ Testing Dependencies
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-//	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	//Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
@@ -49,6 +50,18 @@ dependencies {
 	//Bucket4j Core
 	implementation 'com.bucket4j:bucket4j-redis:8.9.0'
 
+
+	implementation 'org.apache.kafka:kafka-clients:3.9.0'
+	implementation 'org.apache.pdfbox:pdfbox:2.0.29'
+
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	implementation 'jakarta.servlet:jakarta.servlet-api'
+	implementation 'org.springframework.kafka:spring-kafka'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+
+	implementation 'io.micrometer:micrometer-registry-prometheus'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 tasks.named('test') {

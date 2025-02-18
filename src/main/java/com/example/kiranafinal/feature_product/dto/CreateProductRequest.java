@@ -1,7 +1,9 @@
 package com.example.kiranafinal.feature_product.dto;
 
 import lombok.*;
-
+/**
+ * DTO for representing  create product request.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

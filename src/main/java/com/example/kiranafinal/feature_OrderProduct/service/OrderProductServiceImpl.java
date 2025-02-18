@@ -2,25 +2,28 @@ package com.example.kiranafinal.feature_OrderProduct.service;
 
 import com.example.kiranafinal.feature_OrderProduct.dao.OrderProductDAO;
 import com.example.kiranafinal.feature_OrderProduct.dto.OrderProductResponse;
+import com.example.kiranafinal.feature_OrderProduct.logConstants.LogConstants;
 import com.example.kiranafinal.feature_OrderProduct.model.OrderProduct;
-import com.example.kiranafinal.feature_OrderProduct.model.PaymentStatus;
+import com.example.kiranafinal.feature_OrderProduct.enums.PaymentStatus;
 import com.example.kiranafinal.feature_product.model.Product;
 import com.example.kiranafinal.feature_product.repo.ProductRepository;
 import com.example.kiranafinal.feature_transaction.dto.TransactionRequest;
 import com.example.kiranafinal.feature_transaction.dto.TransactionResponse;
-import com.example.kiranafinal.feature_transaction.model.TransactionType;
+import com.example.kiranafinal.feature_transaction.enums.TransactionType;
 import com.example.kiranafinal.feature_transaction.service.TransactionService;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.example.kiranafinal.feature_OrderProduct.logConstants.LogConstants.*;
+
+/**
+ * Service implementation for managing product orders.
+ */
 @Service
 public class OrderProductServiceImpl implements OrderProductService {
 
@@ -33,15 +36,21 @@ public class OrderProductServiceImpl implements OrderProductService {
     @Autowired
     private TransactionService transactionService;
 
+    /**
+     * Adds a product to an order.
+     *
+     * @param productID     The ID of the product to be added.
+     * @param quantity      The quantity of the product.
+     * @param userID        The ID of the user placing the order.
+     * @param paymentStatus The payment status for the order.
+     * @return The response containing order details.
+     */
     @Override
     public OrderProductResponse addToOrder(String productID, Integer quantity, String userID, PaymentStatus paymentStatus) {
-        System.out.println(" [addToOrder] Received: productID=" + productID + ", quantity=" + quantity + ", userID=" + userID + ", paymentStatus=" + paymentStatus);
+        System.out.println(String.format(LogConstants.ADD_TO_ORDER_LOG, productID, quantity, userID, paymentStatus));
 
-        // ✅ Convert String to ObjectId before fetching the product
         Product product = productRepository.findById(productID)
-                .orElseThrow(() -> new RuntimeException(" Product not found with ID: " + productID));
-
-        System.out.println("✅ [addToOrder] Found Product: " + product);
+                .orElseThrow(() -> new RuntimeException(RUNTIME_EXCEPTION + productID));
 
         OrderProduct orderProduct = new OrderProduct();
         orderProduct.setProductID(productID);
@@ -50,92 +59,94 @@ public class OrderProductServiceImpl implements OrderProductService {
         orderProduct.setUnitPrice(BigDecimal.valueOf(product.getPrice()));
         orderProduct.setTotalPrice(BigDecimal.valueOf(product.getPrice()).multiply(BigDecimal.valueOf(quantity)));
         orderProduct.setOrderDate(Instant.now());
-
-        //  Set Payment Status from Request
         orderProduct.setPaymentStatus(paymentStatus);
 
-        System.out.println(" [addToOrder] Created OrderProduct: " + orderProduct);
-
         OrderProduct savedOrder = orderProductDAO.save(orderProduct);
-
-        System.out.println(" [addToOrder] Saved OrderProduct: " + savedOrder);
-
         return mapToResponse(savedOrder);
     }
 
+    /**
+     * Processes checkout for an order.
+     *
+     * @param orderID       The ID of the order to be checked out.
+     * @param paymentStatus The payment status of the order.
+     * @return The response containing updated order details.
+     * @throws RuntimeException if the transaction fails.
+     */
     @Override
     public OrderProductResponse checkoutOrder(String orderID, PaymentStatus paymentStatus) {
-        System.out.println(" [checkoutOrder] Start: OrderID=" + orderID + ", PaymentStatus=" + paymentStatus);
-
+        System.out.println(String.format(LogConstants.CHECKOUT_ORDER_LOG, orderID, paymentStatus));
         OrderProduct order = orderProductDAO.findById(orderID)
-                .orElseThrow(() -> new RuntimeException(" Order not found with ID: " + orderID));
-
-        System.out.println(" [checkoutOrder] Found Order: " + order);
+                .orElseThrow(() -> new RuntimeException(ORDER_NOT_FOUND + orderID));
 
         order.setPaymentStatus(paymentStatus);
 
         if (paymentStatus == PaymentStatus.SUCCESS) {
-            System.out.println(" [checkoutOrder] Payment Successful. Creating Transaction...");
-
+            System.out.println(LogConstants.CHECKOUT_ORDER_PAYMENT_SUCCESS);
             try {
-                // 📝 Create Transaction Request
                 TransactionRequest transactionRequest = new TransactionRequest();
                 transactionRequest.setOrderId(order.getOrderedProductID());
                 transactionRequest.setUserId(order.getUserID());
                 transactionRequest.setTransactionType(TransactionType.DEBIT);
 
-                System.out.println(" [checkoutOrder] Sending Transaction Request: " + transactionRequest);
-
-                //  Call Transaction Service
                 TransactionResponse transactionResponse = transactionService.addTransaction(transactionRequest);
 
                 if (transactionResponse != null) {
-                    System.out.println(" [checkoutOrder] Transaction Created Successfully! TransactionID: " + transactionResponse.getTransactionId());
+                    System.out.println(String.format(LogConstants.CHECKOUT_ORDER_TRANSACTION_CREATED, transactionResponse.getTransactionId()));
                 } else {
-                    System.out.println(" [checkoutOrder] Transaction Creation Failed!");
+                    System.out.println(LogConstants.CHECKOUT_ORDER_TRANSACTION_FAILED);
                 }
             } catch (Exception e) {
-                System.out.println(" [checkoutOrder] Error Creating Transaction: " + e.getMessage());
-//                e.printStackTrace();
-                throw new RuntimeException("Transaction processing failed."+e.getMessage());
+                System.out.printf((LogConstants.CHECKOUT_ORDER_TRANSACTION_ERROR) + "%n", e.getMessage());
+                throw new RuntimeException(TRANSACTION_PROCESSING + e.getMessage());
             }
         } else {
-            System.out.println(" [checkoutOrder] Payment Not Completed. Skipping Transaction.");
+            System.out.println(PAYMENT_NOT_COMPLETE);
         }
 
         OrderProduct savedOrder = orderProductDAO.save(order);
-        System.out.println(" [checkoutOrder] Updated Order: " + savedOrder);
-
         return mapToResponse(savedOrder);
     }
 
-
-
+    /**
+     * Retrieves order details by order ID.
+     *
+     * @param orderID The ID of the order.
+     * @return An Optional containing the order details if found.
+     */
     @Override
     public Optional<OrderProductResponse> getOrderDetails(String orderID) {
         return orderProductDAO.findById(orderID).map(this::mapToResponse);
     }
 
+    /**
+     * Lists all orders.
+     *
+     * @return A list of all orders.
+     */
     @Override
     public List<OrderProductResponse> listAllOrders() {
         return orderProductDAO.findAll().stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
+    /**
+     * Removes an order by order ID.
+     *
+     * @param orderID The ID of the order to be removed.
+     */
     @Override
     public void removeFromOrder(String orderID) {
-
         orderProductDAO.deleteById(orderID);
     }
 
-
+    /**
+     * Maps an OrderProduct entity to an OrderProductResponse DTO.
+     *
+     * @param order The order entity.
+     * @return The response containing order details.
+     */
     private OrderProductResponse mapToResponse(OrderProduct order) {
-        OrderProductResponse orderProductResponse =  new OrderProductResponse();
-//                order.getOrderedProductID(),
-//                order.getProductID(),  // ✅ Keep as String, DO NOT Convert to UUID
-//                order.getQuantity(),
-//                order.getUnitPrice(),
-//                order.getTotalPrice(),
-//                order.getOrderDate()
+        OrderProductResponse orderProductResponse = new OrderProductResponse();
         orderProductResponse.setProductID(order.getProductID());
         orderProductResponse.setQuantity(order.getQuantity());
         orderProductResponse.setUnitPrice(order.getUnitPrice());
@@ -144,5 +155,4 @@ public class OrderProductServiceImpl implements OrderProductService {
         orderProductResponse.setOrderedProductID(order.getOrderedProductID());
         return orderProductResponse;
     }
-
 }

@@ -3,47 +3,64 @@ package com.example.kiranafinal.feature_OrderProduct.dao;
 import com.example.kiranafinal.feature_OrderProduct.model.OrderProduct;
 import com.example.kiranafinal.feature_OrderProduct.repo.OrderProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
+/**
+ * Data Access Object (DAO) for handling order product operations.
+ */
 @Repository
 public class OrderProductDAO {
 
     @Autowired
     private OrderProductRepository orderProductRepository;
 
-//    private static final String ORDER_CACHE = "orderProducts";
-
-    // Save OrderProduct in MongoDB & update cache
-//    @CachePut(value = ORDER_CACHE, key = "#orderProduct.orderedProductID")
+    /**
+     * Saves an order product to the database.
+     *
+     * @param orderProduct The order product to save.
+     * @return The saved order product.
+     */
     public OrderProduct save(OrderProduct orderProduct) {
         return orderProductRepository.save(orderProduct);
     }
 
-    // Fetch OrderProduct by ID (from cache if available)
-//    @Cacheable(value = ORDER_CACHE, key = "#orderedProductID")
-    public Optional<OrderProduct> findById(String orderedProductID) {  // ✅ Expect String, not UUID
+    /**
+     * Finds an order product by its ID.
+     *
+     * @param orderedProductID The ID of the order product.
+     * @return An Optional containing the order product if found.
+     */
+    public Optional<OrderProduct> findById(String orderedProductID) {
         return orderProductRepository.findById(orderedProductID);
     }
 
-
-    // Get all orders (No caching for list retrieval)
+    /**
+     * Retrieves all order products from the database.
+     *
+     * @return A list of all order products.
+     */
     public List<OrderProduct> findAll() {
         return orderProductRepository.findAll();
     }
 
-    public List<OrderProduct> findByTransactionId(String transactionID) {  // ✅ Use String
+    /**
+     * Finds order products by transaction ID.
+     *
+     * @param transactionID The transaction ID associated with the orders.
+     * @return A list of order products related to the given transaction ID.
+     */
+    public List<OrderProduct> findByTransactionId(String transactionID) {
         return orderProductRepository.findByTransactionID(transactionID);
     }
 
-//    // Invalidate cache when deleting an order
-//    @CacheEvict(value = ORDER_CACHE, key = "#orderedProductID")
+    /**
+     * Deletes an order product by its ID.
+     *
+     * @param orderedProductID The ID of the order product to delete.
+     */
     public void deleteById(String orderedProductID) {
         orderProductRepository.deleteById(orderedProductID);
     }

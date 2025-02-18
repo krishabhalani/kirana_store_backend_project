@@ -1,10 +1,12 @@
 package com.example.kiranafinal.feature_user.dto;
 
-import com.example.kiranafinal.feature_user.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Data Transfer Object (DTO) for returning user details in responses.
+ */
 @Getter
 @Setter
 @AllArgsConstructor

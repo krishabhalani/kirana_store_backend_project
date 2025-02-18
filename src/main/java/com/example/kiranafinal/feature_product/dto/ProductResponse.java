@@ -2,6 +2,9 @@ package com.example.kiranafinal.feature_product.dto;
 
 import lombok.*;
 
+/**
+ * DTO for representing product response.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

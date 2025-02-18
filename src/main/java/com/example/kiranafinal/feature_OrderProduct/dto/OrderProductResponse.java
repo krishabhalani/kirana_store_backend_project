@@ -1,12 +1,15 @@
 package com.example.kiranafinal.feature_OrderProduct.dto;
 
-import lombok.AllArgsConstructor;
+
 import lombok.Getter;
 import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ *  DTO for representing  order product response.
+ */
 @Getter
 @Setter
 public class OrderProductResponse {

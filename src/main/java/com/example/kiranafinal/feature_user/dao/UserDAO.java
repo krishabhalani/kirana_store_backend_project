@@ -7,29 +7,42 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Data Access Object (DAO) for user-related database operations.
+ */
 @Repository
 public class UserDAO {
 
     @Autowired
     private UserRepository userRepository;
 
-    // Save new user
+    /**
+     * Saves a new user in the database.
+     *
+     * @param user The user to be saved.
+     * @return The saved user entity.
+     */
     public User save(User user) {
         return userRepository.save(user);
     }
 
+    /**
+     * Retrieves a user by their ID.
+     *
+     * @param userId The ID of the user.
+     * @return An Optional containing the user if found.
+     */
     public Optional<User> findById(String userId) {
-        return userRepository.findById(userId);  // Use String, NOT ObjectId
+        return userRepository.findById(userId);
     }
 
-
-    // Get user by email
+    /**
+     * Retrieves a user by their email.
+     *
+     * @param email The email of the user.
+     * @return An Optional containing the user if found.
+     */
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
-    }
-
-    // Delete user
-    public void deleteById(String userId) {
-        userRepository.deleteById(userId);
     }
 }

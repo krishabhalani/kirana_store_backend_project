@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 
+/**
+ * DTO for representing a transaction report response.
+ */
 @Data
 @AllArgsConstructor
 public class TransactionReportResponse {

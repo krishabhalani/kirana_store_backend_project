@@ -11,6 +11,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.example.kiranafinal.feature_product.logConstants.LogConstants.RUNTIME_EXCEPTION;
+
+/**
+ * Service implementation for managing products.
+ */
 @Service
 public class ProductServiceImpl implements ProductService {
 
@@ -18,11 +23,15 @@ public class ProductServiceImpl implements ProductService {
     private ProductRepository productRepository;
 
     /**
-     * Adds a new product. Throws an exception if the product already exists.
+     * Adds a new product.
+     *
+     * @param createProductRequest The product details.
+     * @return The added product details.
+     * @throws RuntimeException if a product with the same name already exists.
      */
     @Override
     public ProductResponse addProduct(CreateProductRequest createProductRequest) {
-        //  Check if a product with the same name already exists
+        // Check if a product with the same name already exists
         Optional<Product> existingProduct = productRepository.findByName(createProductRequest.getName());
         if (existingProduct.isPresent()) {
             throw new RuntimeException("Product with name '" + createProductRequest.getName() + "' already exists.");
@@ -39,12 +48,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
-     * Updates an existing product. Throws an exception if the product is not found.
+     * Updates an existing product.
+     *
+     * @param productId The ID of the product to update.
+     * @param updateProductRequest The updated product details.
+     * @return The updated product details.
+     * @throws RuntimeException if the product is not found.
      */
     @Override
     public ProductResponse updateProduct(String productId, CreateProductRequest updateProductRequest) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found with ID: " + productId));
+                .orElseThrow(() -> new RuntimeException(RUNTIME_EXCEPTION + productId));
 
         product.setName(updateProductRequest.getName());
         product.setCategory(updateProductRequest.getCategory());
@@ -56,17 +70,23 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
-     *  Retrieves a product by ID. Throws an exception if the product is not found.
+     * Retrieves a product by ID.
+     *
+     * @param productId The ID of the product to retrieve.
+     * @return The product details.
+     * @throws RuntimeException if the product is not found.
      */
     @Override
     public ProductResponse getProductById(String productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found with ID: " + productId));
+                .orElseThrow(() -> new RuntimeException(RUNTIME_EXCEPTION + productId));
         return mapToResponse(product);
     }
 
     /**
-     *  Returns all available products.
+     * Retrieves all available products.
+     *
+     * @return A list of all products.
      */
     @Override
     public List<ProductResponse> getAllProducts() {
@@ -76,11 +96,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
-     * Utility method to map Product to ProductResponse (Prevents repetition).
+     * Maps a Product entity to a ProductResponse DTO.
+     *
+     * @param product The product entity.
+     * @return The product response DTO.
      */
     private ProductResponse mapToResponse(Product product) {
         return new ProductResponse(
-                product.getId().toString(), // ✅ Convert ObjectId to String
+                product.getId().toString(), // Convert ObjectId to String
                 product.getName(),
                 product.getCategory(),
                 product.getPrice(),
