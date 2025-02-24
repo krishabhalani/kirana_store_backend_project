@@ -2,6 +2,7 @@ package com.example.kiranafinal.feature_product.service;
 
 import com.example.kiranafinal.feature_product.dto.CreateProductRequest;
 import com.example.kiranafinal.feature_product.dto.ProductResponse;
+import com.example.kiranafinal.feature_product.exceptions.ProductException;
 import com.example.kiranafinal.feature_product.model.Product;
 import com.example.kiranafinal.feature_product.repo.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,11 @@ import static com.example.kiranafinal.feature_product.logConstants.LogConstants.
 public class ProductServiceImpl implements ProductService {
 
     @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
+
+    public ProductServiceImpl(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
 
     /**
      * Adds a new product.
@@ -34,7 +39,7 @@ public class ProductServiceImpl implements ProductService {
         // Check if a product with the same name already exists
         Optional<Product> existingProduct = productRepository.findByName(createProductRequest.getName());
         if (existingProduct.isPresent()) {
-            throw new RuntimeException("Product with name '" + createProductRequest.getName() + "' already exists.");
+            throw new ProductException("Product with name '" + createProductRequest.getName() + "' already exists.");
         }
 
         Product product = new Product();
@@ -58,7 +63,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse updateProduct(String productId, CreateProductRequest updateProductRequest) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException(RUNTIME_EXCEPTION + productId));
+                .orElseThrow(() -> new ProductException(RUNTIME_EXCEPTION + productId));
 
         product.setName(updateProductRequest.getName());
         product.setCategory(updateProductRequest.getCategory());
@@ -79,7 +84,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse getProductById(String productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException(RUNTIME_EXCEPTION + productId));
+                .orElseThrow(() -> new ProductException(RUNTIME_EXCEPTION + productId));
         return mapToResponse(product);
     }
 
@@ -90,10 +95,17 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll().stream()
+        List<Product> products = productRepository.findAll();
+
+        if (products.isEmpty()) {
+            throw new ProductException("No products available.");
+        }
+
+        return products.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
+
 
     /**
      * Maps a Product entity to a ProductResponse DTO.

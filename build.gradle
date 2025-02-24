@@ -50,18 +50,22 @@ dependencies {
 	//Bucket4j Core
 	implementation 'com.bucket4j:bucket4j-redis:8.9.0'
 
-
+	//Kafka
 	implementation 'org.apache.kafka:kafka-clients:3.9.0'
 	implementation 'org.apache.pdfbox:pdfbox:2.0.29'
-
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	implementation 'jakarta.servlet:jakarta.servlet-api'
 	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-
+	//prometheus
 	implementation 'io.micrometer:micrometer-registry-prometheus'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	//ELK
+	implementation 'org.springframework.boot:spring-boot-starter-logging'
+	implementation 'net.logstash.logback:logstash-logback-encoder:7.2'
+
 }
 
 tasks.named('test') {

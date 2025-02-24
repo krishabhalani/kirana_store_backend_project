@@ -11,7 +11,7 @@ __consumer_offsets 26 0
 __consumer_offsets 21 276
 __consumer_offsets 19 0
 __consumer_offsets 25 0
-weekly-reports 0 2
+weekly-reports 0 4
 __consumer_offsets 33 0
 __consumer_offsets 41 0
 __consumer_offsets 37 0
@@ -27,10 +27,10 @@ __consumer_offsets 39 0
 __consumer_offsets 2 0
 __consumer_offsets 44 0
 __consumer_offsets 12 0
-monthly-reports 0 1
+monthly-reports 0 2
 __consumer_offsets 36 0
 __consumer_offsets 45 0
-__consumer_offsets 16 8
+__consumer_offsets 16 50
 __consumer_offsets 10 0
 __consumer_offsets 11 0
 yearly-reports 0 1

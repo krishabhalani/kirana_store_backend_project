@@ -128,17 +128,6 @@ public class OrderProductServiceImpl implements OrderProductService {
     public List<OrderProductResponse> listAllOrders() {
         return orderProductDAO.findAll().stream().map(this::mapToResponse).collect(Collectors.toList());
     }
-
-    /**
-     * Removes an order by order ID.
-     *
-     * @param orderID The ID of the order to be removed.
-     */
-    @Override
-    public void removeFromOrder(String orderID) {
-        orderProductDAO.deleteById(orderID);
-    }
-
     /**
      * Maps an OrderProduct entity to an OrderProductResponse DTO.
      *

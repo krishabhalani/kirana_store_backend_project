@@ -32,7 +32,7 @@ public class JwtUtil {
                 .claim("roles", roles)
                 .claim("userId", userId)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // Token valid for 1 hour
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -98,6 +98,7 @@ public class JwtUtil {
      */
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = Jwts.parserBuilder()
+                .setAllowedClockSkewSeconds(60) // Allows 60 seconds of clock skew
                 .setSigningKey(SECRET_KEY)
                 .build()
                 .parseClaimsJws(token)

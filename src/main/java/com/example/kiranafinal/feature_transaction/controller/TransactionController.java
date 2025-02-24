@@ -5,6 +5,7 @@ import com.example.kiranafinal.feature_transaction.dto.TransactionReportResponse
 import com.example.kiranafinal.feature_transaction.dto.TransactionRequest;
 import com.example.kiranafinal.feature_transaction.kafka.KafkaProducerService;
 import com.example.kiranafinal.feature_transaction.service.TransactionService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import java.util.UUID;
 /**
  * Controller for managing transactions.
  */
+@Slf4j
 @RestController
 @RequestMapping("/v1/api/transactions")
 public class TransactionController {
@@ -62,6 +64,7 @@ public class TransactionController {
      */
     @GetMapping("listAllTransactions")
     public ResponseEntity<ApiResponse> listAllTransactions() {
+        log.info("listAllTransactions");
         ApiResponse apiResponse = new ApiResponse();
         apiResponse.setData(transactionService.listAllTransactions());
         return ResponseEntity.ok(apiResponse);

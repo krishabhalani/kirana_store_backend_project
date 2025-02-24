@@ -28,7 +28,7 @@ services:
     volumes:
       - mongo_data:/data/db
     networks:
-      - mynetwork
+      - elk
 
 
 
@@ -83,13 +83,72 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_AUTH_ANONYMOUS_ENABLED=true
 
+
+  elasticsearch: # configures the Elasticsearch container.
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+    platform: linux/amd64
+    container_name: elasticsearch # Sets the name of the container to "elasticsearch."
+    environment:
+      - node.name=elasticsearch
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - ES_SKIP_CGROUPS=true
+      - ELASTIC_CONTAINER=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elk
+
+  logstash: #c onfigures the Logstash container.
+    image: docker.elastic.co/logstash/logstash:7.10.0
+    platform: linux/amd64
+    container_name: logstash # Sets the name of the container to "logstash."
+    volumes:
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./logs/sample.log:/usr/share/logstash/data/sample.log
+      - ./logs:/usr/share/logstash/logs
+    ports:
+      - 5000:5000
+    environment:
+      - 'LS_JAVA_OPTS=-Xmx256m -Xms256m' # Sets the Java options for Logstash heap size.
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+
+  kibana: # Configures the Kibana container.
+    image: docker.elastic.co/kibana/kibana:7.10.0
+    platform: linux/amd64
+    container_name: kibana # Sets the name of the container to "kibana."
+    ports:
+      - 5601:5601
+    environment: # Sets the Elasticsearch URL and Node.js options for the Kibana container.
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - 'NODE_OPTIONS=--max-old-space-size=2048'
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
 volumes:
   postgres_data:
   mongo_data:
   redis_data:
+  es-data:
+    driver: local
+
 
 
 
 networks:
-  mynetwork:
+  elk:
     driver: bridge

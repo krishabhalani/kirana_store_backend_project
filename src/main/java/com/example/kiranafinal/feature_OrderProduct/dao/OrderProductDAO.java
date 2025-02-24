@@ -47,16 +47,6 @@ public class OrderProductDAO {
     }
 
     /**
-     * Finds order products by transaction ID.
-     *
-     * @param transactionID The transaction ID associated with the orders.
-     * @return A list of order products related to the given transaction ID.
-     */
-    public List<OrderProduct> findByTransactionId(String transactionID) {
-        return orderProductRepository.findByTransactionID(transactionID);
-    }
-
-    /**
      * Deletes an order product by its ID.
      *
      * @param orderedProductID The ID of the order product to delete.

@@ -46,10 +46,4 @@ public interface OrderProductService {
      */
     List<OrderProductResponse> listAllOrders();
 
-    /**
-     * Removes an order.
-     *
-     * @param orderID The ID of the order to be removed.
-     */
-    void removeFromOrder(String orderID);
 }

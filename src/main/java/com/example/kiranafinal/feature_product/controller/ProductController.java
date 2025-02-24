@@ -5,7 +5,6 @@ import com.example.kiranafinal.feature_product.dto.CreateProductRequest;
 import com.example.kiranafinal.feature_product.dto.ProductResponse;
 import com.example.kiranafinal.feature_product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -35,14 +34,9 @@ public class ProductController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse> createProduct(@RequestBody CreateProductRequest createProductRequest) {
         ApiResponse apiResponse = new ApiResponse();
-        try {
-            ProductResponse addedProduct = productService.addProduct(createProductRequest);
-            apiResponse.setData(PRODUCT_ADDED + addedProduct.getId());
-        } catch (RuntimeException e) {
-            apiResponse.setErrorMessage(e.getMessage());
-            return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        ProductResponse addedProduct = productService.addProduct(createProductRequest);
+        apiResponse.setData(PRODUCT_ADDED + addedProduct.getId());
+        return ResponseEntity.ok(apiResponse);
     }
 
     /**
@@ -55,14 +49,9 @@ public class ProductController {
     @PutMapping("updateProduct/{productId}")
     public ResponseEntity<ApiResponse> updateProduct(@PathVariable String productId, @RequestBody CreateProductRequest updateProductRequest) {
         ApiResponse apiResponse = new ApiResponse();
-        try {
-            productService.updateProduct(productId, updateProductRequest);
-            apiResponse.setData(PRODUCT_UPDATED + productId);
-        } catch (RuntimeException e) {
-            apiResponse.setErrorMessage(e.getMessage());
-            return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        productService.updateProduct(productId, updateProductRequest);
+        apiResponse.setData(PRODUCT_UPDATED + productId);
+        return ResponseEntity.ok(apiResponse);
     }
 
     /**
@@ -74,13 +63,8 @@ public class ProductController {
     @GetMapping("getProduct/{productId}")
     public ResponseEntity<ApiResponse> getProduct(@PathVariable String productId) {
         ApiResponse apiResponse = new ApiResponse();
-        try {
-            apiResponse.setData(productService.getProductById(productId));
-        } catch (RuntimeException e) {
-            apiResponse.setErrorMessage(e.getMessage());
-            return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        apiResponse.setData(productService.getProductById(productId));
+        return ResponseEntity.ok(apiResponse);
     }
 
     /**
@@ -92,11 +76,8 @@ public class ProductController {
     public ResponseEntity<ApiResponse> listAllProducts() {
         ApiResponse apiResponse = new ApiResponse();
         List<ProductResponse> products = productService.getAllProducts();
-        if (products.isEmpty()) {
-            apiResponse.setErrorMessage(ERROR_MESSAGE);
-            return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
-        }
         apiResponse.setData(products);
-        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        return ResponseEntity.ok(apiResponse);
     }
+
 }
